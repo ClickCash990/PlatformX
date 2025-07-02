@@ -58,4 +58,4 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS profiles_username_idx ON public.profiles(username);
+CREATE INDEX IF NOT EXISTS profiles_username_idx ON public.profiles(username);supabase functions deploy tradingview-webhook --no-verify-jwt

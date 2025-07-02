@@ -24,7 +24,54 @@ export const AuthForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<AuthCredentials>();
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<AuthCredentials>();
+
+  const fillDemoCredentials = () => {
+    setValue('email', 'demo@example.com');
+    setValue('password', 'demo123');
+  };
+
+  const createDemoAccount = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: 'demo@example.com',
+        password: 'demo123',
+        options: {
+          data: {
+            first_name: 'Demo',
+            last_name: 'User',
+            address: '123 Demo Street, Demo City',
+            years_experience: '1-3',
+            how_heard_about: 'demo',
+            newsletter: false
+          }
+        }
+      });
+      
+      if (signUpError) {
+        if (signUpError.message.toLowerCase().includes('user already registered') || 
+            signUpError.message.toLowerCase().includes('user already exists') ||
+            (signUpError as any).code === 'user_already_exists') {
+          toast.success('Demo account already exists! You can now sign in.');
+          fillDemoCredentials();
+        } else {
+          throw new Error(signUpError.message);
+        }
+      } else {
+        toast.success('Demo account created! You can now sign in with the demo credentials.');
+        fillDemoCredentials();
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create demo account';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onSubmit = async (data: AuthCredentials) => {
     setIsLoading(true);
@@ -44,7 +91,12 @@ export const AuthForm: React.FC = () => {
         if (error) {
           // Provide more specific error messages
           if (error.message.includes('Invalid login credentials')) {
-            throw new Error('Invalid email or password. Please check your credentials and try again.');
+            // Check if this is the demo account
+            if (data.email === 'demo@example.com') {
+              throw new Error('Demo account not found. Please create the demo account first using the button above, or sign up with your own credentials.');
+            } else {
+              throw new Error('Invalid email or password. Please check your credentials and try again, or create a new account if you don\'t have one.');
+            }
           } else if (error.message.includes('Email not confirmed')) {
             throw new Error('Please check your email and click the confirmation link before signing in.');
           } else {
@@ -179,17 +231,31 @@ export const AuthForm: React.FC = () => {
           {/* Demo credentials info for login */}
           {isLogin && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>
-              <p className="text-xs text-blue-700 mb-2">
-                To test the platform, create a new account or use these demo credentials:
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Account</h3>
+              <p className="text-xs text-blue-700 mb-3">
+                To test the platform, you can create and use a demo account:
               </p>
-              <div className="text-xs text-blue-600 space-y-1">
+              <div className="text-xs text-blue-600 space-y-1 mb-3">
                 <div><strong>Email:</strong> demo@example.com</div>
                 <div><strong>Password:</strong> demo123</div>
               </div>
-              <p className="text-xs text-blue-600 mt-2">
-                Note: You'll need to create this account first if it doesn't exist.
-              </p>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={createDemoAccount}
+                  disabled={isLoading}
+                  className="flex-1 px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  Create Demo Account
+                </button>
+                <button
+                  type="button"
+                  onClick={fillDemoCredentials}
+                  className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 text-xs rounded hover:bg-blue-200 transition-colors"
+                >
+                  Fill Demo Credentials
+                </button>
+              </div>
             </div>
           )}
 

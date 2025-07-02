@@ -72,33 +72,36 @@ function generateBotToken(): string {
 // IMPROVED: Function to get MT5 symbol based on account type
 // Now properly handles special symbols like XAUUSD, XAGUSD, etc.
 function getMT5Symbol(symbol: string, accountType?: 'demo' | 'live' | 'prop'): string {
+  // First normalize the symbol to ensure consistent format
+  const normalizedSymbol = normalizeSymbol(symbol);
+  
   // Special case: never modify precious metals, indices, or crypto
-  if (symbol.startsWith('XAU') || 
-      symbol.startsWith('XAG') || 
-      symbol.startsWith('US30') || 
-      symbol.startsWith('NAS100') || 
-      symbol.startsWith('SPX500') ||
-      symbol.startsWith('UK100') ||
-      symbol.startsWith('GER30') ||
-      symbol.startsWith('BTC') ||
-      symbol.startsWith('ETH') ||
-      symbol.startsWith('LTC') ||
-      symbol.startsWith('XRP') ||
-      symbol.startsWith('BCH') ||
-      symbol.includes('OIL')) {
-    return symbol;
+  if (normalizedSymbol.startsWith('XAU') || 
+      normalizedSymbol.startsWith('XAG') || 
+      normalizedSymbol.startsWith('US30') || 
+      normalizedSymbol.startsWith('NAS100') || 
+      normalizedSymbol.startsWith('SPX500') ||
+      normalizedSymbol.startsWith('UK100') ||
+      normalizedSymbol.startsWith('GER30') ||
+      normalizedSymbol.startsWith('BTC') ||
+      normalizedSymbol.startsWith('ETH') ||
+      normalizedSymbol.startsWith('LTC') ||
+      normalizedSymbol.startsWith('XRP') ||
+      normalizedSymbol.startsWith('BCH') ||
+      normalizedSymbol.includes('OIL')) {
+    return normalizedSymbol;
   }
   
   // For prop accounts, append .raw if not already present and not a special symbol
   if (accountType === 'prop') {
     // Only append .raw if the symbol doesn't already have an extension
-    if (!symbol.match(/\.(raw|m|c|pro|ecn|stp)$/i)) {
-      return symbol + '.raw';
+    if (!normalizedSymbol.match(/\.(raw|m|c|pro|ecn|stp)$/i)) {
+      return normalizedSymbol + '.raw';
     }
   }
   
-  // For live and demo accounts or if already has extension, return as-is
-  return symbol;
+  // For live and demo accounts or if already has extension, return normalized symbol
+  return normalizedSymbol;
 }
 
 export const useTradingStore = create<TradingState>((set, get) => ({

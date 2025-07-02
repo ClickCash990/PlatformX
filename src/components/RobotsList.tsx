@@ -281,7 +281,7 @@ export const RobotsList: React.FC = () => {
 
           {/* Enhanced Stats Overview with Better Colors */}
           {totalRobots > 0 && (
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm">
                 <div className="flex items-center space-x-2">
                   <Bot className="w-4 h-4 text-blue-600" />
@@ -333,6 +333,18 @@ export const RobotsList: React.FC = () => {
                     <p className="text-xs text-indigo-600 font-medium">Floating P&L</p>
                     <p className={`text-lg font-bold ${totalFloatingPnL >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                       ${totalFloatingPnL.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg p-3 shadow-sm">
+                <div className="flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4 text-slate-600" />
+                  <div>
+                    <p className="text-xs text-slate-600 font-medium">Total P&L</p>
+                    <p className={`text-lg font-bold ${totalCombinedProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      ${totalCombinedProfit.toFixed(2)}
                     </p>
                   </div>
                 </div>
